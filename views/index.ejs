@@ -3,22 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home Page</title>
+    <title>Skyrockit</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
-  <body>
-    <% if(user) {%>
-        <h1>Welcome to the App! <%= user.username%></h1>
-        <p>
-            <a href="/auth/sign-out">Sign out</a>
-        </p>
-    <% } else { %>
-        <h1>Welcome guest user</h1>
-        <a href="/auth/sign-up">Sign Up</a>
-        <a href="/auth/sign-in">Sign In</a>
-    <% } %>
-
-    <p>
-        <a href="/vip-lounge">Get into the VIP Users only lounge</a>
-    </p>
+  <body class="index-body">
+    <%- include("./partials/_navbar.ejs") %>
+    <div class="index-container">
+      <div class="text-container">
+        <h1 class="main-header">Skyrockit</h1>
+        <p class="subheader">A job application tracker.</p>
+      </div>
+    </div>
+    <div class="auth-links">
+      <a class="signup-link" href="/auth/sign-up">Sign Up</a>
+      <a class="signin-link" href="/auth/sign-in">Sign In</a>
+    </div>
   </body>
 </html>

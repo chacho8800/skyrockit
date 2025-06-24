@@ -5,15 +5,22 @@ dotenv.config();
 const express = require("express");
 const app = express();
 const authController = require("./controllers/auth.js");
+const applicationController = require("./controllers/applications.js")
 const session = require("express-session");
+
+const IsSignedId = require("./middleware/is-signed-in.js")
+const passUserToView = require("./middleware/pass-user-to-view.js")
 
 const mongoose = require("mongoose");
 
 const methodOverride = require("method-override");
 const morgan = require("morgan");
+const isSignedIn = require("./middleware/is-signed-in.js");
 
 // Set the port from environment variable or default to 3000
 const port = process.env.PORT ? process.env.PORT : "3000";
+
+const path = require("path")
 
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -27,6 +34,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride("_method"));
 // Morgan for logging HTTP requests
 app.use(morgan("dev"));
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 // attach sessions
 app.use(
   session({
@@ -35,32 +46,38 @@ app.use(
     saveUninitialized: true,
   })
 );
-// define a middleware to check is user logged in
-const isLoggedIn = (req, res, next) => {
-  if (req.session.user) {
-    next();
-  } else {
-    res.redirect("/auth/sign-in");
-  }
-};
+
+app.use(passUserToView)
+
 
 // ROUTES
 app.get("/", (req, res) => {
   // res.send("hello friend")
-  res.render("index.ejs", {
-    user: req.session.user,
-  });
+  if(req.session.user) {
+    res.redirect(`/users/${req.session.user._id}/applications`)
+  } else {
+    res.render("index.ejs")
+  }
+  
 });
 
 // /auth/ + any route will be handled by authController
 app.use("/auth", authController);
 
-app.use(isLoggedIn) // any routes under this require login
-
-app.get("/vip-lounge", isLoggedIn, (req, res) => {
-  res.send("Welcome to the VIP lounge, " + req.session.user.username);
-});
-
+app.use(isSignedIn)
+// any routes under here are protected and use 
+// must be signed in to acces them
+/*
+Action	Route	HTTP Verb
+Index	'/users/:userId/applications'	GET
+New	'/users/:userId/applications/new'	GET
+Create	'/users/:userId/applications'	POST
+Show	'/users/:userId/applications/:applicationId'	GET
+Edit	'/users/:userId/applications/:applicationId/edit'	GET
+Update	'/users/:userId/applications/:applicationId'	PUT
+Delete	'/users/:userId/applications/:applicationId'	DELETE
+*/
+app.use("/users/:userId/applications", applicationController)
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);

@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="/stylesheets/partials.css" />
+
+<nav>
+
+    <% if (user) {%>
+        <div class="navbar">
+            <a href="/users/ <%= %> user._id/applications">
+            <h1 id="nav-header">Skyrockit</h1>
+            </a>
+            <div class="nav-links">
+              <a class="authlink" href="/users/<%=user._id%>/applications"
+                >Your Apps</a
+              >
+              <a class="authlink" href="/auth/sign-up">Sign Up</a>
+            </div>
+          </div>
+        <% } else { %>
+            <div class="navbar">
+                <a href="/">
+                <h1 id="nav-header">Skyrockit</h1>
+                </a>
+                <div class="nav-links">
+                  <a class="authlink" href="/auth/sign-in">Sign In</a>
+                  <a class="authlink" href="/auth/sign-up">Sign Up</a>
+                </div>
+              </div>
+        <% } %>
+</nav>
